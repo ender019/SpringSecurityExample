@@ -14,4 +14,16 @@ public class MainController {
         if(principal == null) return null;
         return principal.getName();
     }
+
+    @GetMapping("admin")
+    public String adminAccess(Principal principal){
+        if(principal == null) return null;
+        return "admin: " + principal.getName();
+    }
+
+    @GetMapping("service")
+    public String serviceAccess(Principal principal){
+        if(principal == null) return null;
+        return "service: " + principal.getName();
+    }
 }

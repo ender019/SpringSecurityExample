@@ -27,14 +27,6 @@ public class JwtCore {
                 .compact();
     }
 
-    public String generateToken(String username){
-        byte[] bytes = Base64.getDecoder().decode(secret.getBytes(StandardCharsets.UTF_8));
-        return Jwts.builder().subject((username)).issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + lifetime))
-                .signWith(new SecretKeySpec(bytes, "HmacSHA256"))
-                .compact();
-    }
-
     public String getNameFromJwt(String token) {
         byte[] bytes = Base64.getDecoder().decode(secret.getBytes(StandardCharsets.UTF_8));
         return Jwts.parser()

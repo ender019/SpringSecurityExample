@@ -1,11 +1,12 @@
 package com.server.autorization.controllers;
 
 import com.server.autorization.JWTfuncs.JwtCore;
-import com.server.autorization.JWTfuncs.UserDetailsImpl;
 import com.server.autorization.models.User;
 import com.server.autorization.repositories.UserRepository;
 import com.server.autorization.requests.SigninRequest;
 import com.server.autorization.requests.SignupRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,6 @@ import org.springframework.web.bind.annotation.*;
 public class SecurityController {
     @Value("${service.connect.username}")
     private String service_username;
-
-    @Value("${service.connect.password}")
-    private String service_password;
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -43,7 +40,7 @@ public class SecurityController {
     }
 
     @PostMapping("/signin")
-    ResponseEntity<?> signin(@RequestBody SigninRequest signinRequest)
+    ResponseEntity<?> signin(@RequestBody SigninRequest signinRequest, HttpServletResponse response)
     {
         Authentication authentication = null;
         try {
@@ -53,7 +50,12 @@ public class SecurityController {
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtCore.generateToken(authentication);
-        return ResponseEntity.ok(jwt);
+        jakarta.servlet.http.Cookie cookie = new Cookie("token", jwt);
+        cookie.setPath("/");
+        cookie.setMaxAge(86400);
+        response.addCookie(cookie);
+        response.setContentType("text/plain");
+        return ResponseEntity.ok("success signing in");
     }
 
     @PostMapping("/signup")
@@ -75,11 +77,23 @@ public class SecurityController {
     }
 
     @PostMapping("/connect")
-    ResponseEntity<?> service_connect(@RequestBody SigninRequest connectRequest)
+    ResponseEntity<?> service_connect(@RequestBody SigninRequest connectRequest, HttpServletResponse response)
     {
-        if (service_username.equals(connectRequest.getUsername()) && service_password.equals(connectRequest.getPassword())) {
-            String jwt = jwtCore.generateToken(service_username);
-            return ResponseEntity.ok(jwt);
+        if (service_username.equals(connectRequest.getUsername())) {
+            Authentication authentication = null;
+            try {
+                authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(connectRequest.getUsername(), connectRequest.getPassword()));
+            } catch (BadCredentialsException e) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtCore.generateToken(authentication);
+            jakarta.servlet.http.Cookie cookie = new Cookie("token", jwt);
+            cookie.setPath("/");
+            cookie.setMaxAge(86400);
+            response.addCookie(cookie);
+            response.setContentType("text/plain");
+            return ResponseEntity.ok("success connect");
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }

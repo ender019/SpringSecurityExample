@@ -3,6 +3,7 @@ package com.server.autorization.JWTfuncs;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,16 @@ public class TokenFilter extends OncePerRequestFilter {
         UserDetails userDetails = null;
         UsernamePasswordAuthenticationToken auth = null;
         try {
-            String headerAuth = request.getHeader("Authorization");
-            if(headerAuth != null && headerAuth.startsWith("Bearer ")) {
-                jwt = headerAuth.substring(7);
+            Cookie[] cookieAuth = request.getCookies();
+            try {
+                jwt = cookieAuth[0].getValue();
+            } catch (IndexOutOfBoundsException e) {
+//                String headerAuth = request.getHeader("Authorization");
+//                if(headerAuth != null && headerAuth.startsWith("Bearer ")) {
+//                    jwt = headerAuth.substring(7);
+//                }
             }
+
             if(jwt != null) {
                 try {
                     username = jwtCore.getNameFromJwt(jwt);
