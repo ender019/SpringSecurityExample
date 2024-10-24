@@ -16,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
 @RestController
 @RequestMapping("/auth")
 public class SecurityController {
@@ -30,11 +28,19 @@ public class SecurityController {
     @Autowired
     private JwtCore jwtCore;
 
+    @GetMapping("/test")
+    ResponseEntity<?> test_session()
+    {
+        return ResponseEntity.ok("connected");
+    }
+
     @PostMapping("/signin")
-    ResponseEntity<?> signin(@RequestBody SigninRequest signinRequest) {
+    ResponseEntity<?> signin(@RequestBody SigninRequest signinRequest)
+    {
         Authentication authentication = null;
         try {
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -59,5 +65,20 @@ public class SecurityController {
         user.setPassword(hash);
         userRepository.save(user);
         return ResponseEntity.ok("Success");
+    }
+
+    @PostMapping("/connect")
+    ResponseEntity<?> service_connect(@RequestBody SignupRequest connectRequest)
+    {
+        Authentication authentication = null;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(connectRequest.getUsername(), connectRequest.getPassword()));
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtCore.generateToken(authentication);
+        return ResponseEntity.ok(jwt);
     }
 }

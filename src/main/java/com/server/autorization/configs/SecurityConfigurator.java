@@ -45,6 +45,9 @@ public class SecurityConfigurator {
     @Primary
     public AuthenticationManagerBuilder configureAuthenticationManagerBuilder(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(passwordEncoder());
+        authenticationManagerBuilder.inMemoryAuthentication()
+                .withUser("user")
+                .password("password");
         return authenticationManagerBuilder;
     }
 
