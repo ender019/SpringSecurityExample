@@ -36,18 +36,18 @@ public class SecurityConfigurator {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean(name = "authenticationManager")
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean(name = "configureAuthenticationManagerBuilder")
+    @Bean
     @Primary
     public AuthenticationManagerBuilder configureAuthenticationManagerBuilder(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(passwordEncoder());
-        authenticationManagerBuilder.inMemoryAuthentication()
-                .withUser("user")
-                .password("password");
+//        authenticationManagerBuilder.inMemoryAuthentication()
+//                .withUser("user")
+//                .password(passwordEncoder().encode("password"));
         return authenticationManagerBuilder;
     }
 

@@ -1,11 +1,14 @@
 package com.server.autorization.models;
 
+import com.server.autorization.JWTfuncs.UserDetailsImpl;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -17,5 +20,12 @@ public class User {
     private String email;
     @Column
     private String password;
+
+    public User(String username, String password){
+        this.id = (long)-1;
+        this.username = username;
+        this.email = "Bebecon@service.ru";
+        this.password = password;
+    }
 
 }

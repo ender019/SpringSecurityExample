@@ -1,11 +1,13 @@
 package com.server.autorization.controllers;
 
 import com.server.autorization.JWTfuncs.JwtCore;
+import com.server.autorization.JWTfuncs.UserDetailsImpl;
 import com.server.autorization.models.User;
 import com.server.autorization.repositories.UserRepository;
 import com.server.autorization.requests.SigninRequest;
 import com.server.autorization.requests.SignupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +21,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class SecurityController {
+    @Value("${service.connect.username}")
+    private String service_username;
+
+    @Value("${service.connect.password}")
+    private String service_password;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -39,8 +47,7 @@ public class SecurityController {
     {
         Authentication authentication = null;
         try {
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -68,17 +75,12 @@ public class SecurityController {
     }
 
     @PostMapping("/connect")
-    ResponseEntity<?> service_connect(@RequestBody SignupRequest connectRequest)
+    ResponseEntity<?> service_connect(@RequestBody SigninRequest connectRequest)
     {
-        Authentication authentication = null;
-        try {
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(connectRequest.getUsername(), connectRequest.getPassword()));
-        } catch (BadCredentialsException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (service_username.equals(connectRequest.getUsername()) && service_password.equals(connectRequest.getPassword())) {
+            String jwt = jwtCore.generateToken(service_username);
+            return ResponseEntity.ok(jwt);
         }
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtCore.generateToken(authentication);
-        return ResponseEntity.ok(jwt);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
