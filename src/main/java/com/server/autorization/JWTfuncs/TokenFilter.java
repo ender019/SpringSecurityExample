@@ -34,10 +34,10 @@ public class TokenFilter extends OncePerRequestFilter {
             try {
                 jwt = cookieAuth[0].getValue();
             } catch (IndexOutOfBoundsException e) {
-//                String headerAuth = request.getHeader("Authorization");
-//                if(headerAuth != null && headerAuth.startsWith("Bearer ")) {
-//                    jwt = headerAuth.substring(7);
-//                }
+                String headerAuth = request.getHeader("Authorization");
+                if(headerAuth != null && headerAuth.startsWith("Bearer ")) {
+                    jwt = headerAuth.substring(7);
+                }
             }
 
             if(jwt != null) {

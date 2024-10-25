@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class SecurityController {
     @Value("${service.connect.username}")
     private String service_username;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired

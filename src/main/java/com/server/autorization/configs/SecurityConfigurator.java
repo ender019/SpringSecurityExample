@@ -63,9 +63,9 @@ public class SecurityConfigurator {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/secured/**").fullyAuthenticated()
                         .requestMatchers("/secured/admin").hasAnyRole("Admin", "Service")
                         .requestMatchers("/secured/service").hasRole("Service")
+                        .requestMatchers("/secured/**").fullyAuthenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
