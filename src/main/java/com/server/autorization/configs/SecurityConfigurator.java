@@ -2,6 +2,7 @@ package com.server.autorization.configs;
 
 import com.server.autorization.JWTfuncs.TokenFilter;
 import com.server.autorization.services.UserService;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,13 +24,12 @@ import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
+@NoArgsConstructor
 public class SecurityConfigurator {
     @Autowired
     private UserService userService;
     @Autowired
     private TokenFilter tokenFilter;
-
-    public SecurityConfigurator() {}
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -62,10 +62,11 @@ public class SecurityConfigurator {
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/secured/admin").hasAnyRole("ADMIN", "SERVICE")
-                        .requestMatchers("/secured/service").hasRole("SERVICE")
+                        .requestMatchers("/secured/service").hasAuthority("SERVICE")
+                        .requestMatchers("/secured/admin").hasAnyAuthority("ADMIN", "SERVICE")
+                        .requestMatchers("/service/**").hasAnyAuthority("ADMIN", "SERVICE")
                         .requestMatchers("/secured/**").fullyAuthenticated()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);

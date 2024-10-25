@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://26.44.55.174:5173")
 public class SecurityController {
     @Value("${service.connect.username}")
     private String service_username;
@@ -94,7 +95,7 @@ public class SecurityController {
             cookie.setMaxAge(86400);
             response.addCookie(cookie);
             response.setContentType("text/plain");
-            return ResponseEntity.ok("success connect");
+            return ResponseEntity.ok("success connect, " + jwt);
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
