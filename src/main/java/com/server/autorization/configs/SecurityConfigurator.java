@@ -63,8 +63,8 @@ public class SecurityConfigurator {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/secured/admin").hasAnyRole("Admin", "Service")
-                        .requestMatchers("/secured/service").hasRole("Service")
+                        .requestMatchers("/secured/admin").hasAnyRole("ADMIN", "SERVICE")
+                        .requestMatchers("/secured/service").hasRole("SERVICE")
                         .requestMatchers("/secured/**").fullyAuthenticated()
                         .anyRequest().permitAll()
                 )

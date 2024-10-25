@@ -20,12 +20,15 @@ public class User {
     private String email;
     @Column
     private String password;
+    @Column
+    private String role;
 
     public User(String username, String password){
         this.id = (long)-1;
         this.username = username;
         this.email = "Bebecon@service.ru";
         this.password = password;
+        this.role = "SERVICE";
     }
 
 }
